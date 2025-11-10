@@ -47,8 +47,8 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Ciclo de vida",
-      url: "#",
+      title: "Plantas",
+      url: "/plants",
       icon: IconListDetails,
     },
     {
