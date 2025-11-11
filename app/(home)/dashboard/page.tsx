@@ -9,7 +9,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 
 const getMyData = async (accessToken: string) => {
-  const client = createApolloClient({ accessToken });
+  const client = await createApolloClient({ accessToken });
   const { data, error } = await client.query({
     query: MeDocument,
   });

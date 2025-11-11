@@ -1,0 +1,20 @@
+query Containers {
+  containers {
+    id
+    plant {
+        id
+    }
+    name
+    maxCapacityL
+    currentInventoryL
+    isActive
+    gasEntries {
+        id
+    }
+    invoices {
+        id
+    }
+    createdAt
+    updatedAt
+  }
+}
