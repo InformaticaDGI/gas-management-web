@@ -3,7 +3,7 @@
  * URL base para la API de GraphQL de suministro y facturación para gas doméstico.
  */
 
-export const API_BASE_URL: string = "https://base.guarico.gob.ve/";
+export const API_BASE_URL: string = "https://demo-api-sgd.guarico.gob.ve/graphql";
 
 /**
  * @constant

@@ -16,22 +16,35 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    await signIn("credentials", {
-      username,
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
       password,
     });
+
+
+    if (!result?.ok) {
+      toast.error(result?.error as string, {
+        description: "Por favor, verifique sus credenciales"
+      });
+    }
+    
+    router.push("/dashboard");
 
   }
 
@@ -50,12 +63,12 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="jsmith"
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="example@example.com"
                   required
                 />
               </Field>
