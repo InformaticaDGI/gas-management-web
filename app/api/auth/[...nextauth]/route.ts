@@ -15,8 +15,7 @@ export const authOptions: AuthOptions = {
 
                 if (!credentials) throw new Error('Credentials are required');
 
-                const client = createApolloClient();
-
+                const client = await createApolloClient();
 
                 const { data, error } = await client.mutate({
                     mutation: LoginDocument,

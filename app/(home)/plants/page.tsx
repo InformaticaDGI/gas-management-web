@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 const getPlants = async (accessToken: string) => {
-    const client = createApolloClient({ accessToken });
+    const client = await createApolloClient({ accessToken });
     const { data, error } = await client.query({
         query: GetPlantsDocument,
     });

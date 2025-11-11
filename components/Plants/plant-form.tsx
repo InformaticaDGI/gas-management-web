@@ -22,7 +22,7 @@ export default function PlantForm({ companies, accessToken }: { companies: { add
         const name = formData.get("name")?.toString() ?? "";
         const phone = formData.get("phone")?.toString() ?? "";
         
-        const client = createApolloClient({ accessToken });
+        const client = await createApolloClient({ accessToken });
 
         const { error } = await client.mutate({
             mutation: CreatePlantDocument,

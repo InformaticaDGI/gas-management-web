@@ -50,7 +50,7 @@ const data = {
     },
     {
       title: "Tanques",
-      url: "/inventory/tanks",
+      url: "/inventory/containers",
       icon: IconDatabaseLeak,
     },
   ],
