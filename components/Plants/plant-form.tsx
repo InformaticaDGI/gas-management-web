@@ -7,11 +7,11 @@ import { Select } from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import createApolloClient from "@/graphql-client";
-import { CreatePlantDocument } from "@/graphql/generated/graphql";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod";
+import { CreatePlantDocument } from "@/graphql/generated/graphql";
 
 const phoneRegex = new RegExp(
     /^\+58(2(12|3[4-9]|4[1-8]|5[1-9]|6[1-9]|7[0-8]|8[1-3]|9[1-6])|4(1[246]|2[46]))\d{7}$/
@@ -45,7 +45,7 @@ export default function PlantForm({ companies, accessToken }: { companies: { add
 
     const onSubmit = async (values: PlantFormSchema) => {
         const { companyId, address, email, name, phone } = values;
-        const client = createApolloClient({ accessToken });
+        const client = await createApolloClient({ accessToken });
         const code = "PLT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
         const { error } = await client.mutate({

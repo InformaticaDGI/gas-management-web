@@ -27,7 +27,7 @@ export default async function DashboardPage() {
   if (!session || !session.accessToken) {
     redirect("/auth/login");
   }
-  
+
   const response = await getMyData(session.accessToken);
 
   console.log({ session: session.accessToken });
