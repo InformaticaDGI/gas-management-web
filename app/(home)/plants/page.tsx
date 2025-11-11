@@ -1,4 +1,4 @@
-import { PlantDataTable } from "@/components/plant-datatable";
+import { PlantDataTable } from "@/components/Plants/plant-datatable";
 
 
 export default function PlantsPage() {

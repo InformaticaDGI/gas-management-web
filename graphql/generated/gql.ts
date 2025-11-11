@@ -14,10 +14,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "query Countries {\n  countries {\n    code\n    name\n    emoji\n  }\n}": typeof types.CountriesDocument,
+    "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}": typeof types.LoginDocument,
+    "query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}": typeof types.MeDocument,
 };
 const documents: Documents = {
-    "query Countries {\n  countries {\n    code\n    name\n    emoji\n  }\n}": types.CountriesDocument,
+    "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}": types.LoginDocument,
+    "query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}": types.MeDocument,
 };
 
 /**
@@ -37,7 +39,11 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query Countries {\n  countries {\n    code\n    name\n    emoji\n  }\n}"): (typeof documents)["query Countries {\n  countries {\n    code\n    name\n    emoji\n  }\n}"];
+export function gql(source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}"): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
