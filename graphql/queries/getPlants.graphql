@@ -1,0 +1,17 @@
+query getPlants {
+  plants {
+    id
+    code
+    name
+    address
+    phone
+    email
+    isActive
+    updatedAt
+    createdAt
+    company {
+      id
+      name
+    }
+  }
+}

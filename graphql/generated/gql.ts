@@ -14,12 +14,16 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "mutation CreatePlant($companyId: ID!, $name: String!, $code: String!, $address: String!, $phone: String!, $email: String!) {\n  createPlant(\n    companyId: $companyId\n    name: $name\n    code: $code\n    address: $address\n    phone: $phone\n    email: $email\n  ) {\n    id\n    code\n    address\n    email\n    isActive\n    phone\n    createdAt\n    updatedAt\n  }\n}": typeof types.CreatePlantDocument,
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}": typeof types.LoginDocument,
+    "query Companies {\n  companies {\n    address\n    name\n    id\n    rif\n  }\n}": typeof types.CompaniesDocument,
     "query getPlants {\n  plants {\n    id\n    code\n    name\n    address\n    phone\n    email\n    isActive\n    updatedAt\n    createdAt\n    company {\n      id\n      name\n    }\n  }\n}": typeof types.GetPlantsDocument,
     "query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}": typeof types.MeDocument,
 };
 const documents: Documents = {
+    "mutation CreatePlant($companyId: ID!, $name: String!, $code: String!, $address: String!, $phone: String!, $email: String!) {\n  createPlant(\n    companyId: $companyId\n    name: $name\n    code: $code\n    address: $address\n    phone: $phone\n    email: $email\n  ) {\n    id\n    code\n    address\n    email\n    isActive\n    phone\n    createdAt\n    updatedAt\n  }\n}": types.CreatePlantDocument,
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}": types.LoginDocument,
+    "query Companies {\n  companies {\n    address\n    name\n    id\n    rif\n  }\n}": types.CompaniesDocument,
     "query getPlants {\n  plants {\n    id\n    code\n    name\n    address\n    phone\n    email\n    isActive\n    updatedAt\n    createdAt\n    company {\n      id\n      name\n    }\n  }\n}": types.GetPlantsDocument,
     "query Me {\n  me {\n    id\n    email\n    name\n    isActive\n    createdAt\n    updatedAt\n  }\n}": types.MeDocument,
 };
@@ -41,7 +45,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "mutation CreatePlant($companyId: ID!, $name: String!, $code: String!, $address: String!, $phone: String!, $email: String!) {\n  createPlant(\n    companyId: $companyId\n    name: $name\n    code: $code\n    address: $address\n    phone: $phone\n    email: $email\n  ) {\n    id\n    code\n    address\n    email\n    isActive\n    phone\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["mutation CreatePlant($companyId: ID!, $name: String!, $code: String!, $address: String!, $phone: String!, $email: String!) {\n  createPlant(\n    companyId: $companyId\n    name: $name\n    code: $code\n    address: $address\n    phone: $phone\n    email: $email\n  ) {\n    id\n    code\n    address\n    email\n    isActive\n    phone\n    createdAt\n    updatedAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}"): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    expiresIn\n    token\n    user {\n      id\n      email\n      name\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query Companies {\n  companies {\n    address\n    name\n    id\n    rif\n  }\n}"): (typeof documents)["query Companies {\n  companies {\n    address\n    name\n    id\n    rif\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -1,0 +1,12 @@
+mutation CreatePlant($companyId: ID!, $name: String!, $code: String!, $address: String!, $phone: String!, $email: String!) {
+  createPlant(companyId: $companyId, name: $name, code: $code, address: $address, phone: $phone, email: $email) {
+    id
+    code
+    address
+    email
+    isActive
+    phone
+    createdAt
+    updatedAt
+  }
+}
