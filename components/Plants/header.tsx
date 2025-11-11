@@ -1,6 +1,7 @@
 import { IconCirclePlusFilled } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function PlantHeader() {
   return (
@@ -8,9 +9,11 @@ export function PlantHeader() {
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <h1 className="text-base font-medium">Plantas</h1>
         <div className="ml-auto flex items-center gap-2">
-          <Button size="sm" className="hidden h-7 sm:flex">
+          <Button size="sm" className="hidden h-7 sm:flex" asChild>
+            <Link href="/plants/crear">
             <IconCirclePlusFilled />
             <span>Crear planta</span>
+            </Link>
           </Button>
         </div>
       </div>
