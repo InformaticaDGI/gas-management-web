@@ -7,6 +7,8 @@ import {
   IconChartBar,
   IconDashboard,
   IconDatabase,
+  IconDatabaseLeak,
+  IconDropletPlus,
   IconFileAi,
   IconFileDescription,
   IconFileWord,
@@ -40,6 +42,18 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
+  inventory: [
+    {
+      title: "Entradas",
+      url: "/inventory/entries",
+      icon: IconDropletPlus,
+    },
+    {
+      title: "Tanques",
+      url: "/inventory/tanks",
+      icon: IconDatabaseLeak,
+    },
+  ],
   navMain: [
     {
       title: "Tablero",
@@ -170,7 +184,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} label="Inicio" />
+        <NavMain items={data.inventory} label="Inventario" />
         <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>

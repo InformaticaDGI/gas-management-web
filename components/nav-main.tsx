@@ -14,7 +14,9 @@ import { useRouter } from "next/navigation"
 
 export function NavMain({
   items,
+  label,
 }: {
+  label: string
   items: {
     title: string
     url: string
@@ -25,7 +27,7 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupContent>
-        <SidebarGroupLabel>Inicio</SidebarGroupLabel>
+        <SidebarGroupLabel>{label}</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
