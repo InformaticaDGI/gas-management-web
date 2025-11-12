@@ -1,10 +1,12 @@
 import createApolloClient from "@/graphql-client";
 import { ContainersDocument } from "@/graphql/generated/graphql";
+import { ContainersDataTable } from "@/components/containers/containers-datatable";
 
 export default async function ContainersPage({ accessToken }: { accessToken: string }) {
 
     const { data, error } = await (await createApolloClient({ accessToken })).query({
         query: ContainersDocument,
+        errorPolicy: 'ignore'
     });
 
     if (error) {
@@ -16,7 +18,6 @@ export default async function ContainersPage({ accessToken }: { accessToken: str
     }
 
     return <div>
-        <h1>Tanques</h1>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        <ContainersDataTable data={data?.containers || []} />
     </div>
 }
