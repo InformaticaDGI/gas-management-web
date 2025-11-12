@@ -1,0 +1,24 @@
+query Users {
+  users {
+    id
+    email
+    name
+    isActive
+    createdAt
+    updatedAt
+    userPlants {
+      id
+      plant {
+        id
+        name
+      }
+      company {
+        id
+        name
+      }
+      role
+      createdAt
+      updatedAt
+    }
+  }
+}

@@ -27,7 +27,6 @@ export const authOptions: AuthOptions = {
                     }
                 })
 
-
                 if (error || !data) throw new Error('Invalid credentials');
 
                 const { user, token: accessToken, expiresIn } = data.login;
@@ -51,17 +50,25 @@ export const authOptions: AuthOptions = {
     },
     callbacks: {
         async jwt({ token, user }) {
-            if(user) {
+            if (user) {
                 token.id = user.id;
                 token.accessToken = user.accessToken;
+                token.expiresIn = user.expiresIn;
             }
+            console.log({ type: 'jwt', token, user })
             return token;
         },
         async session({ session, token }) {
             session.user.id = token.sub as string;
             session.accessToken = token.accessToken;
+            session.expiresIn = token.expiresIn;
+            console.log({ type: 'session', session, token })
             return session;
         }
+    },
+    session: {
+        maxAge: 86400,
+        strategy: "jwt"
     }
 };
 

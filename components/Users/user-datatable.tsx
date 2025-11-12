@@ -26,6 +26,8 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconCircleCheckFilled,
+  IconCircleX,
   IconGripVertical,
   IconLayoutColumns,
 } from "@tabler/icons-react"
@@ -53,6 +55,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
+
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import {
@@ -74,8 +77,9 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { PlantSchema } from "@/schemas/plant.schema"
-import { plantDictionaryNames } from "@/lib/dictionaries"
+import { AssignPlantToUserCommand } from "./assign-plant-to-user-command"
+import { UserSchema } from "@/schemas/user.schema"
+import { userDictionaryNames } from "@/lib/dictionaries"
 
 
 // Create a separate component for the drag handle
@@ -93,12 +97,14 @@ function DragHandle({ id }: { id: string }) {
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
       <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Arrastrar para reordenar</span>
+      <span className="sr-only">Drag to reorder</span>
     </Button>
   )
 }
 
-const columns: ColumnDef<PlantSchema>[] = [
+
+
+const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], accessToken: string): ColumnDef<UserSchema>[] => [
   {
     id: "drag",
     header: () => null,
@@ -131,56 +137,91 @@ const columns: ColumnDef<PlantSchema>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "code",
-    header: "Código",
-    cell: ({ row }) => (<div className="w-32">
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.code}
-      </Badge>
-    </div>),
-  },
-  {
     accessorKey: "name",
     header: "Nombre",
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.name}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "address",
-    header: "Dirección",
-    cell: ({ row }) => (
+    cell: ({ row }) => (<div className="w-32">
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.address}
+        {row.original.name}
       </Badge>
-    ),
-  },
-  {
-    accessorKey: "phone",
-    header: "Teléfono",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.phone}
-      </Badge>
-    ),
+    </div>),
   },
   {
     accessorKey: "email",
     header: "Correo",
     cell: ({ row }) => (
+      <div className="w-32">
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.email}
+        </Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      return row.original.isActive ? (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          Activo
+        </Badge>
+      ) : (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          <IconCircleX className="fill-red-500 dark:fill-red-400" />
+          Inactivo
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: "userPlants",
+    header: "Plantas",
+    cell: ({ row }) => {
+      const plants = row.original.userPlants || [];
+      const plantNames = plants.map(up => up.plant.name);
+      const displayCount = 2;
+
+      if (plants.length === 0) {
+        return <Badge variant="outline">Sin plantas</Badge>;
+      }
+
+      if (plants.length <= displayCount) {
+        return (
+          <div className="flex flex-wrap gap-1">
+            {plantNames.map((name, i) => (
+              <Badge key={i} variant="secondary">{name}</Badge>
+            ))}
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex flex-wrap gap-1">
+          {plantNames.slice(0, displayCount).map((name, i) => (
+            <Badge key={i} variant="secondary">{name}</Badge>
+          ))}
+          <Badge variant="outline">+{plants.length - displayCount} más</Badge>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "size-plants",
+    header: "Cantidad",
+    cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.email}
+        {row.original.userPlants.length}
       </Badge>
     ),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <AssignPlantToUserCommand userId={row.original.id} plants={plants} accessToken={accessToken} userPlants={row.original.userPlants.map(up => up.plant.id)} />
   },
 
 ]
 
-function DraggableRow({ row }: { row: Row<PlantSchema> }) {
+function DraggableRow({ row }: { row: Row<UserSchema> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -205,10 +246,14 @@ function DraggableRow({ row }: { row: Row<PlantSchema> }) {
   )
 }
 
-export function PlantDataTable({
+export function UserDataTable({
   data: initialData,
+  plants,
+  accessToken
 }: {
-  data: PlantSchema[]
+  data: UserSchema[],
+  accessToken: string,
+  plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[]
 }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
@@ -233,6 +278,8 @@ export function PlantDataTable({
     () => data?.map(({ id }) => id) || [],
     [data]
   )
+
+  const columns = React.useMemo(() => createColumns(plants, accessToken), [plants, accessToken]);
 
   const table = useReactTable({
     data,
@@ -277,7 +324,7 @@ export function PlantDataTable({
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
-          Vista
+          View
         </Label>
 
 
@@ -309,7 +356,7 @@ export function PlantDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {plantDictionaryNames[column.id] || column.id}
+                      {userDictionaryNames[column.id] || column.id}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
