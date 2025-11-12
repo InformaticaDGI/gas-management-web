@@ -5,11 +5,17 @@ import { Field, FieldLabel, FieldGroup, FieldLegend, FieldSet, FieldDescription 
 import { Select } from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import createApolloClient from "@/graphql-client";
-import { CreateContainerDocument } from "@/graphql/generated/graphql";
+import { CreateContainerMutation } from "@/graphql/generated/graphql";
 import { toast } from "sonner";
+import { CreateContainerInput } from "@/app/actions";
+import { ErrorLike } from "@apollo/client";
 
-export default function ContainerForm({ plants }: { plants: { id: string, name: string }[] }) {
+type CreateContainer = {
+    error: ErrorLike | undefined;
+    data: CreateContainerMutation | undefined;
+}
+
+export default function ContainerForm({ plants, createContainer }: { plants: { id: string, name: string }[], createContainer: (container: CreateContainerInput) => Promise<CreateContainer> }) {
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,16 +27,11 @@ export default function ContainerForm({ plants }: { plants: { id: string, name: 
         const maxCapacityL = parseFloat(formData.get("maxCapacityL")?.toString() ?? "0");
         const currentInventoryL = parseFloat(formData.get("currentInventoryL")?.toString() ?? "0");
         
-        const client = await createApolloClient();
-
-        const { error } = await client.mutate({
-            mutation: CreateContainerDocument,
-            variables: {
-                plantId,
-                name,
-                maxCapacityL,
-                currentInventoryL,
-            }
+        const { error, data } = await createContainer({
+            plantId,
+            name,
+            maxCapacityL,
+            currentInventoryL,
         });
 
         if (error) {
