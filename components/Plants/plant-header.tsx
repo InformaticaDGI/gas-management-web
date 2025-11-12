@@ -10,7 +10,7 @@ export function PlantHeader() {
         <h1 className="text-base font-medium">Plantas</h1>
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" className="hidden h-7 sm:flex" asChild>
-            <Link href="/plants/crear">
+            <Link href="/plants/create">
             <IconCirclePlusFilled />
             <span>Crear planta</span>
             </Link>

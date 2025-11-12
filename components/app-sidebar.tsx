@@ -54,6 +54,13 @@ const data = {
       icon: IconDatabaseLeak,
     },
   ],
+  users: [
+    {
+      title: "Usuarios",
+      url: "/users",
+      icon: IconUsers,
+    },
+  ],
   navMain: [
     {
       title: "Tablero",
@@ -74,11 +81,6 @@ const data = {
       title: "Productos",
       url: "/products",
       icon: IconFolder,
-    },
-    {
-      title: "Usuarios",
-      url: "/users",
-      icon: IconUsers,
     },
   ],
   navClouds: [
@@ -186,6 +188,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} label="Inicio" />
         <NavMain items={data.inventory} label="Inventario" />
+        <NavMain items={data.users} label="Usuarios" />
         <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>

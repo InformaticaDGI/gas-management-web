@@ -1,6 +1,6 @@
 @sdjron.dev
 1 - Plant [ x ]
-2 - User [ ]
+2 - User [ x ]
 3 - UserPlant [ ]
 4 - Product [ ]
 5 - Customer [ ]

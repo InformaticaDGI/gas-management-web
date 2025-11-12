@@ -26,9 +26,11 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconCircleCheckFilled,
+  IconCircleX,
+  IconDotsVertical,
   IconGripVertical,
   IconLayoutColumns,
-  IconPlus,
 } from "@tabler/icons-react"
 import {
   ColumnDef,
@@ -53,8 +55,16 @@ import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
+  DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSubContent,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import {
@@ -76,32 +86,49 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { useRouter } from "next/navigation"
+import { MoreHorizontal } from "lucide-react"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command"
+import { AssignPlantToUserCommand } from "./assign-plant-to-user-command"
+import { SessionProvider } from "next-auth/react"
+import { Session } from "next-auth"
+
 
 const companySchema = z.object({
   id: z.string(),
   name: z.string(),
 })
 
-export const schema = z.object({
+const plantSchema = z.object({
   id: z.string(),
-  code: z.string(),
   name: z.string(),
-  address: z.string(),
-  phone: z.string(),
-  email: z.string(),
-  isActive: z.boolean(),
-  updatedAt: z.string(),
+})
+
+const userPlantSchema = z.object({
+  id: z.string(),
+  role: z.string(),
   createdAt: z.string(),
+  updatedAt: z.string(),
+  plant: plantSchema,
   company: companySchema,
 })
 
+export const schema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string(),
+  isActive: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  userPlants: z.array(userPlantSchema),
+})
+
 const dictionaryNames: Record<string, string> = {
-  code: "Código",
   name: "Nombre",
-  address: "Dirección",
-  phone: "Teléfono",
-  email: "Correo"
+  email: "Correo",
+  role: "Rol",
+  status: "Estado",
+  userPlants: "Plantas",
+  "size-plants": "Cantidad"
 }
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: string }) {
@@ -123,7 +150,9 @@ function DragHandle({ id }: { id: string }) {
   )
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+
+
+const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], accessToken: string): ColumnDef<z.infer<typeof schema>>[] => [
   {
     id: "drag",
     header: () => null,
@@ -156,53 +185,88 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "code",
-    header: "Código",
-    cell: ({ row }) => (<div className="w-32">
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.code}
-      </Badge>
-    </div>),
-  },
-  {
     accessorKey: "name",
     header: "Nombre",
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.name}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "address",
-    header: "Dirección",
-    cell: ({ row }) => (
+    cell: ({ row }) => (<div className="w-32">
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.address}
+        {row.original.name}
       </Badge>
-    ),
-  },
-  {
-    accessorKey: "phone",
-    header: "Teléfono",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.phone}
-      </Badge>
-    ),
+    </div>),
   },
   {
     accessorKey: "email",
     header: "Correo",
     cell: ({ row }) => (
+      <div className="w-32">
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.email}
+        </Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      return row.original.isActive ? (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          Activo
+        </Badge>
+      ) : (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          <IconCircleX className="fill-red-500 dark:fill-red-400" />
+          Inactivo
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: "userPlants",
+    header: "Plantas",
+    cell: ({ row }) => {
+      const plants = row.original.userPlants || [];
+      const plantNames = plants.map(up => up.plant.name);
+      const displayCount = 2;
+
+      if (plants.length === 0) {
+        return <Badge variant="outline">Sin plantas</Badge>;
+      }
+
+      if (plants.length <= displayCount) {
+        return (
+          <div className="flex flex-wrap gap-1">
+            {plantNames.map((name, i) => (
+              <Badge key={i} variant="secondary">{name}</Badge>
+            ))}
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex flex-wrap gap-1">
+          {plantNames.slice(0, displayCount).map((name, i) => (
+            <Badge key={i} variant="secondary">{name}</Badge>
+          ))}
+          <Badge variant="outline">+{plants.length - displayCount} más</Badge>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "size-plants",
+    header: "Cantidad",
+    cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.email}
+        {row.original.userPlants.length}
       </Badge>
     ),
   },
-  
+  {
+    id: "actions",
+    cell: ({ row }) => <AssignPlantToUserCommand userId={row.original.id} plants={plants} accessToken={accessToken} userPlants={row.original.userPlants.map(up => up.plant.id)} />
+  },
+
 ]
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
@@ -230,12 +294,15 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   )
 }
 
-export function PlantDataTable({
+export function UserDataTable({
   data: initialData,
+  plants,
+  accessToken
 }: {
-  data: z.infer<typeof schema>[]
+  data: z.infer<typeof schema>[],
+  accessToken: string,
+  plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[]
 }) {
-  const router = useRouter();
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -259,6 +326,8 @@ export function PlantDataTable({
     () => data?.map(({ id }) => id) || [],
     [data]
   )
+
+  const columns = React.useMemo(() => createColumns(plants, accessToken), [plants, accessToken]);
 
   const table = useReactTable({
     data,

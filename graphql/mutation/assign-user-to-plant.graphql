@@ -1,0 +1,9 @@
+mutation AssignUserToPlant($userId: ID!, $plantId: ID!, $role: UserRole!) {
+  assignUserToPlant(userId: $userId, plantId: $plantId, role: $role) {
+    id
+    role
+    isActive
+    createdAt
+    updatedAt
+  }
+}
