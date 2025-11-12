@@ -23,12 +23,16 @@ import { Button } from "../ui/button"
 import { Check, MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import createApolloClient from "@/graphql-client"
-import { AssignUserToPlantDocument, UserRole } from "@/graphql/generated/graphql"
+import { AssignUserToPlantMutation, UserRole } from "@/graphql/generated/graphql"
 import { toast } from "sonner"
+import { ErrorLike } from "@apollo/client"
+import { AssignUserToPlantInput } from "@/app/actions"
 
-
-export function AssignPlantToUserCommand({ userPlants, userId, plants, accessToken }: {
+type AssignUserToPlant = {
+    error: ErrorLike | undefined;
+    data: AssignUserToPlantMutation | undefined;
+}
+export function AssignPlantToUserCommand({ userPlants, userId, plants, assignUserToPlant }: {
     userPlants: string[],
     userId: string,
     plants: {
@@ -47,7 +51,7 @@ export function AssignPlantToUserCommand({ userPlants, userId, plants, accessTok
             name: string
         }
     }[],
-    accessToken: string
+    assignUserToPlant: (input: AssignUserToPlantInput) => Promise<AssignUserToPlant>
 }) {
     const [values, setValues] = useState<string[]>(userPlants)
 
@@ -56,14 +60,10 @@ export function AssignPlantToUserCommand({ userPlants, userId, plants, accessTok
             toast.error("La planta ya está asignada");
             return;
         }
-        const client = await createApolloClient({ accessToken });
-        const { error } = await client.mutate({
-            mutation: AssignUserToPlantDocument,
-            variables: {
-                userId,
-                plantId,
-                role: UserRole.AdminPlanta,
-            },
+        const { error } = await assignUserToPlant({
+            userId,
+            plantId,
+            role: UserRole.AdminPlanta,
         });
         if (error) {
             console.error("Error al asignar la planta:", error);

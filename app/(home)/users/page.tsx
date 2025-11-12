@@ -1,42 +1,9 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { assignUserToPlant, getPlants, getUsers } from "@/app/actions";
 import { UserDataTable } from "@/components/Users/user-datatable";
 import { UserHeader } from "@/components/Users/user-header";
-import createApolloClient from "@/graphql-client";
-import { GetPlantsDocument, UsersDocument } from "@/graphql/generated/graphql";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-
-const getUsers = async (accessToken: string) => {
-    const client = await createApolloClient({ accessToken });
-    const { data, error } = await client.query({
-        query: UsersDocument,
-    });
-    if (error) {
-        console.error("Error al obtener los usuarios:", error);
-        return null;
-    }
-    return data;
-}
-
-
-const getPlants = async (accessToken: string) => {
-    const client = await createApolloClient({ accessToken });
-    const { data, error } = await client.query({
-        query: GetPlantsDocument,
-    });
-    if (error) {
-        console.error("Error al obtener las plantas:", error);
-        return null;
-    }
-    return data;
-}
 
 export default async function UsersPage() {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.accessToken) {
-        redirect("/auth/login");
-    }
-    const [users, plants] = await Promise.all([getUsers(session.accessToken), getPlants(session.accessToken)]);
+    const [users, plants] = await Promise.all([getUsers(), getPlants()]);
 
     if (!users || !plants) {
         return <div>
@@ -54,7 +21,13 @@ export default async function UsersPage() {
             <div className="@container/main flex flex-1 flex-col gap-2">
                 <div>
                     <div className="w-full max-w-full py-4">
-                        <UserDataTable data={users.users} plants={plants.plants} accessToken={session.accessToken} />
+                        <UserDataTable data={users.users.map(user => ({
+                            ...user,
+                            userPlants: user.userPlants.map(up => ({
+                                ...up,
+                                plant: up.plant as any
+                            }))
+                        }))} plants={plants.plants} assignUserToPlant={assignUserToPlant}/>
                     </div>
                 </div>
             </div>

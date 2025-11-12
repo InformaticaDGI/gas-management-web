@@ -10,12 +10,17 @@ import createApolloClient from "@/graphql-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CreatePlantDocument } from "@/graphql/generated/graphql";
+import { CreatePlantDocument, CreatePlantMutation } from "@/graphql/generated/graphql";
 import { plantFormSchema, PlantFormSchema } from "@/schemas/plant.schema";
+import { CreatePlantInput } from "@/app/actions";
+import { ErrorLike } from "@apollo/client";
 
+type CreatePlant = {
+    error: ErrorLike | undefined;
+    data: CreatePlantMutation | undefined;
+}
 
-
-export default function PlantForm({ companies, accessToken }: { companies: { address: string, name: string, id: string, rif: string }[], accessToken: string }) {
+export default function PlantForm({ companies, createPlant }: { companies: { address: string, name: string, id: string, rif: string }[], createPlant: (plant: CreatePlantInput) => Promise<CreatePlant> }) {
 
     const router = useRouter();
     const form = useForm<PlantFormSchema>({
@@ -34,19 +39,15 @@ export default function PlantForm({ companies, accessToken }: { companies: { add
 
     const onSubmit = async (values: PlantFormSchema) => {
         const { companyId, address, email, name, phone } = values;
-        const client = await createApolloClient({ accessToken });
         const code = "PLT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-        const { error } = await client.mutate({
-            mutation: CreatePlantDocument,
-            variables: {
-                address,
-                companyId,
-                email,
-                name,
-                phone,
-                code
-            }
+        const { error } = await createPlant({
+            address,
+            companyId,
+            email,
+            name,
+            phone,
+            code
         });
 
         if (error) {

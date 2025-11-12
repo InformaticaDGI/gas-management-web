@@ -80,8 +80,14 @@ import {
 import { AssignPlantToUserCommand } from "./assign-plant-to-user-command"
 import { UserSchema } from "@/schemas/user.schema"
 import { userDictionaryNames } from "@/lib/dictionaries"
+import { AssignUserToPlantInput } from "@/app/actions"
+import { ErrorLike } from "@apollo/client"
+import { AssignUserToPlantMutation } from "@/graphql/generated/graphql"
 
-
+type AssignUserToPlant = {
+  error: ErrorLike | undefined;
+  data: AssignUserToPlantMutation | undefined;
+}
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: string }) {
   const { attributes, listeners } = useSortable({
@@ -104,7 +110,7 @@ function DragHandle({ id }: { id: string }) {
 
 
 
-const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], accessToken: string): ColumnDef<UserSchema>[] => [
+const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], assignUserToPlant: (input: AssignUserToPlantInput) => Promise<AssignUserToPlant>): ColumnDef<UserSchema>[] => [
   {
     id: "drag",
     header: () => null,
@@ -216,7 +222,7 @@ const createColumns = (plants: { __typename?: "Plant", id: string, code: string,
   },
   {
     id: "actions",
-    cell: ({ row }) => <AssignPlantToUserCommand userId={row.original.id} plants={plants} accessToken={accessToken} userPlants={row.original.userPlants.map(up => up.plant.id)} />
+    cell: ({ row }) => <AssignPlantToUserCommand userId={row.original.id} plants={plants} userPlants={row.original.userPlants.map(up => up.plant.id)} assignUserToPlant={assignUserToPlant} />
   },
 
 ]
@@ -249,11 +255,11 @@ function DraggableRow({ row }: { row: Row<UserSchema> }) {
 export function UserDataTable({
   data: initialData,
   plants,
-  accessToken
+  assignUserToPlant
 }: {
   data: UserSchema[],
-  accessToken: string,
-  plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[]
+  plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[],
+  assignUserToPlant: (input: AssignUserToPlantInput) => Promise<AssignUserToPlant>
 }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
@@ -279,7 +285,7 @@ export function UserDataTable({
     [data]
   )
 
-  const columns = React.useMemo(() => createColumns(plants, accessToken), [plants, accessToken]);
+  const columns = React.useMemo(() => createColumns(plants, assignUserToPlant), [plants, assignUserToPlant]);
 
   const table = useReactTable({
     data,
