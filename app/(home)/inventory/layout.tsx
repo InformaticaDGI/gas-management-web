@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 
 export default async function InventoryLayout({
@@ -17,7 +18,7 @@ export default async function InventoryLayout({
     }
 
     return <>
-        <SiteHeader title="Inventario" children={<Button>Crear entrada</Button>} />
+        <SiteHeader title="Inventario" children={<Button asChild><Link href="/inventory/containers/create">Crear entrada</Link></Button>} />
         <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2 py-4 px-6">
                 {children}
