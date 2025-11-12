@@ -10,24 +10,14 @@ import createApolloClient from "@/graphql-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod";
 import { CreatePlantDocument } from "@/graphql/generated/graphql";
+import { plantFormSchema, PlantFormSchema } from "@/schemas/plant.schema";
 
-const phoneRegex = new RegExp(
-    /^\+58(2(12|3[4-9]|4[1-8]|5[1-9]|6[1-9]|7[0-8]|8[1-3]|9[1-6])|4(1[246]|2[46]))\d{7}$/
-  );
-const plantFormSchema = z.object({
-    companyId: z.string().min(1, { message: "La empresa es requerida" }),
-    name: z.string().min(1, { message: "El nombre es requerido" }),
-    address: z.string().min(1, { message: "La dirección es requerida" }),
-    email: z.email({ message: "El correo electrónico no es válido" }),
-    phone: z.string().regex(phoneRegex, { message: "Formato inválido. Debe ser: +58 XXX XXXXXXX (ej: +58 4241234567)" }),
-});
 
-type PlantFormSchema = z.infer<typeof plantFormSchema>;
 
 export default function PlantForm({ companies, accessToken }: { companies: { address: string, name: string, id: string, rif: string }[], accessToken: string }) {
 
+    const router = useRouter();
     const form = useForm<PlantFormSchema>({
         resolver: zodResolver(plantFormSchema),
         mode: "onChange",
@@ -41,7 +31,6 @@ export default function PlantForm({ companies, accessToken }: { companies: { add
     })
 
 
-    const router = useRouter();
 
     const onSubmit = async (values: PlantFormSchema) => {
         const { companyId, address, email, name, phone } = values;

@@ -4,24 +4,17 @@ import { Field, FieldLabel, FieldGroup, FieldLegend, FieldSet, FieldDescription,
 import { useForm } from "react-hook-form"
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import createApolloClient from "@/graphql-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod";
 import { CreateUserDocument } from "@/graphql/generated/graphql";
+import { userFormSchema, UserFormSchema } from "@/schemas/user.schema";
+import createApolloClient from "@/graphql-client";
 
-
-const userFormSchema = z.object({
-    name: z.string().min(1, { message: "El nombre es requerido" }),
-    email: z.email({ message: "El correo electrónico no es válido" }),
-    password: z.string().min(8, { message: "La contraseña debe tener al menos 8 caracteres" }),
-});
-
-type UserFormSchema = z.infer<typeof userFormSchema>;
 
 export default function UserForm({ accessToken }: { accessToken: string }) {
 
+    const router = useRouter();
     const form = useForm<UserFormSchema>({
         resolver: zodResolver(userFormSchema),
         mode: "onChange",
@@ -33,7 +26,6 @@ export default function UserForm({ accessToken }: { accessToken: string }) {
     })
 
 
-    const router = useRouter();
 
     const onSubmit = async (values: UserFormSchema) => {
         const { email, name, password } = values;
@@ -44,7 +36,7 @@ export default function UserForm({ accessToken }: { accessToken: string }) {
             variables: {
                 email,
                 name,
-                password,
+                password
             }
         });
 

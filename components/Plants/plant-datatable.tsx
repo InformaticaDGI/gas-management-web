@@ -28,7 +28,6 @@ import {
   IconChevronsRight,
   IconGripVertical,
   IconLayoutColumns,
-  IconPlus,
 } from "@tabler/icons-react"
 import {
   ColumnDef,
@@ -45,7 +44,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { z } from "zod"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -76,33 +74,10 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { useRouter } from "next/navigation"
+import { PlantSchema } from "@/schemas/plant.schema"
+import { plantDictionaryNames } from "@/lib/dictionaries"
 
-const companySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-})
 
-export const schema = z.object({
-  id: z.string(),
-  code: z.string(),
-  name: z.string(),
-  address: z.string(),
-  phone: z.string(),
-  email: z.string(),
-  isActive: z.boolean(),
-  updatedAt: z.string(),
-  createdAt: z.string(),
-  company: companySchema,
-})
-
-const dictionaryNames: Record<string, string> = {
-  code: "Código",
-  name: "Nombre",
-  address: "Dirección",
-  phone: "Teléfono",
-  email: "Correo"
-}
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: string }) {
   const { attributes, listeners } = useSortable({
@@ -118,12 +93,12 @@ function DragHandle({ id }: { id: string }) {
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
       <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
+      <span className="sr-only">Arrastrar para reordenar</span>
     </Button>
   )
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const columns: ColumnDef<PlantSchema>[] = [
   {
     id: "drag",
     header: () => null,
@@ -202,10 +177,10 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       </Badge>
     ),
   },
-  
+
 ]
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
+function DraggableRow({ row }: { row: Row<PlantSchema> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -233,9 +208,8 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 export function PlantDataTable({
   data: initialData,
 }: {
-  data: z.infer<typeof schema>[]
+  data: PlantSchema[]
 }) {
-  const router = useRouter();
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -303,7 +277,7 @@ export function PlantDataTable({
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
-          View
+          Vista
         </Label>
 
 
@@ -335,7 +309,7 @@ export function PlantDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {dictionaryNames[column.id] || column.id}
+                      {plantDictionaryNames[column.id] || column.id}
                     </DropdownMenuCheckboxItem>
                   )
                 })}

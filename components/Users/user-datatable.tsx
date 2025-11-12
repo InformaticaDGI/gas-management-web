@@ -28,7 +28,6 @@ import {
   IconChevronsRight,
   IconCircleCheckFilled,
   IconCircleX,
-  IconDotsVertical,
   IconGripVertical,
   IconLayoutColumns,
 } from "@tabler/icons-react"
@@ -47,7 +46,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { z } from "zod"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -55,16 +53,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
-  DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuSubContent,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
+
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import {
@@ -86,50 +77,11 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { MoreHorizontal } from "lucide-react"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command"
 import { AssignPlantToUserCommand } from "./assign-plant-to-user-command"
-import { SessionProvider } from "next-auth/react"
-import { Session } from "next-auth"
+import { UserSchema } from "@/schemas/user.schema"
+import { userDictionaryNames } from "@/lib/dictionaries"
 
 
-const companySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-})
-
-const plantSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-})
-
-const userPlantSchema = z.object({
-  id: z.string(),
-  role: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  plant: plantSchema,
-  company: companySchema,
-})
-
-export const schema = z.object({
-  id: z.string(),
-  email: z.string(),
-  name: z.string(),
-  isActive: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  userPlants: z.array(userPlantSchema),
-})
-
-const dictionaryNames: Record<string, string> = {
-  name: "Nombre",
-  email: "Correo",
-  role: "Rol",
-  status: "Estado",
-  userPlants: "Plantas",
-  "size-plants": "Cantidad"
-}
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: string }) {
   const { attributes, listeners } = useSortable({
@@ -152,7 +104,7 @@ function DragHandle({ id }: { id: string }) {
 
 
 
-const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], accessToken: string): ColumnDef<z.infer<typeof schema>>[] => [
+const createColumns = (plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[], accessToken: string): ColumnDef<UserSchema>[] => [
   {
     id: "drag",
     header: () => null,
@@ -269,7 +221,7 @@ const createColumns = (plants: { __typename?: "Plant", id: string, code: string,
 
 ]
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
+function DraggableRow({ row }: { row: Row<UserSchema> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -299,7 +251,7 @@ export function UserDataTable({
   plants,
   accessToken
 }: {
-  data: z.infer<typeof schema>[],
+  data: UserSchema[],
   accessToken: string,
   plants: { __typename?: "Plant", id: string, code: string, name: string, address: string, phone: string, email: string, isActive: boolean, updatedAt: any, createdAt: any, company: { id: string, name: string } }[]
 }) {
@@ -404,7 +356,7 @@ export function UserDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {dictionaryNames[column.id] || column.id}
+                      {userDictionaryNames[column.id] || column.id}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
