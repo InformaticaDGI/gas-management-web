@@ -4,7 +4,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, GetPlantsDocument, GetProductsDocument, LoginDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
+import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
 
 
 export async function createApolloClient({ accessToken }: CreateApolloClientProps = {}) {
@@ -195,6 +195,21 @@ export async function createProduct(input: CreateProductInput) {
         }
     });
 
+    return {
+        error,
+        data
+    };
+}
+
+export async function getMe() {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.query({
+        query: MeDocument,
+    });
     return {
         error,
         data

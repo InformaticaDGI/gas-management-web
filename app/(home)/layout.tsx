@@ -1,20 +1,27 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { getMe } from "../actions";
+import { signOut } from "next-auth/react";
 
 export default async function Layout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.accessToken) {
-      redirect("/auth/login");
+  const { data, error } = await getMe();
+
+  if (error || !data || !data.me) {
+    console.error("Error al obtener los datos del usuario:", error);
+    redirect("/auth/login");
   }
 
-    return <SidebarProvider
+  if (!data.me.isActive) {
+    signOut({ redirect: true, callbackUrl: "/auth/login" });
+  }
+
+
+  return <SidebarProvider
     className="hidden md:flex"
     style={
       {
