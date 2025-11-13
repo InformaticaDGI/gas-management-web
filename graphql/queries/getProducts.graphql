@@ -1,0 +1,14 @@
+query getProducts {
+  products {
+    id
+    name
+    type
+    baseCapacity
+    baseUnit
+    price
+    customerType
+    isActive
+    createdAt
+    updatedAt
+  }
+}

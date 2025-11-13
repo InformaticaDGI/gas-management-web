@@ -1,8 +1,8 @@
 @sdjron.dev
 1 - Plant [ x ]
 2 - User [ x ]
-3 - UserPlant [ ]
-4 - Product [ ]
+3 - UserPlant [ x ]
+4 - Product [ x ]
 5 - Customer [ ]
 6 - RegisteredCylinder [ ]
 

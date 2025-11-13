@@ -5,6 +5,7 @@ import Link from "next/link"
 import {
   IconCamera,
   IconChartBar,
+  IconCylinder,
   IconDashboard,
   IconDatabase,
   IconDatabaseLeak,
@@ -16,6 +17,9 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
+  IconPackageExport,
+  IconPackageImport,
+  IconPackages,
   IconReport,
   IconSearch,
   IconSettings,
@@ -52,6 +56,11 @@ const data = {
       title: "Tanques",
       url: "/inventory/containers",
       icon: IconDatabaseLeak,
+    },
+    {
+      title: "Productos",
+      url: "/inventory/products",
+      icon: IconPackages,
     },
   ],
   users: [

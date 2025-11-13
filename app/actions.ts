@@ -4,7 +4,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateUserDocument, GetPlantsDocument, LoginDocument, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
+import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, GetPlantsDocument, GetProductsDocument, LoginDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
 
 
 export async function createApolloClient({ accessToken }: CreateApolloClientProps = {}) {
@@ -66,6 +66,22 @@ export async function getCompanies() {
     });
     return {
         companies: data?.companies || [],
+        error: error ? error.message : null,
+    };
+}
+
+export async function getProducts() {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { data, error } = await client.query({
+        query: GetProductsDocument,
+    });
+
+    return {
+        products: data?.products || [],
         error: error ? error.message : null,
     };
 }
@@ -166,6 +182,26 @@ export async function assignUserToPlant(input: AssignUserToPlantInput) {
     };
 }
 
+export async function createProduct(input: CreateProductInput) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.mutate({
+        mutation: CreateProductDocument,
+        variables: {
+            input
+        }
+    });
+
+    return {
+        error,
+        data
+    };
+}
+
+
 
 /** Input Types */
 
@@ -205,4 +241,13 @@ export type CreateUserInput = {
     email: string;
     password: string;
     name: string;
+}
+
+export type CreateProductInput = {
+    name: string;
+    type: ProductType;
+    baseCapacity: number;
+    baseUnit: UnitType;
+    price: number;
+    customerType: CustomerType;
 }
