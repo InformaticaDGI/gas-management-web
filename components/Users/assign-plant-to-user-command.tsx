@@ -23,35 +23,15 @@ import { Button } from "../ui/button"
 import { Check, MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AssignUserToPlantMutation, UserRole } from "@/graphql/generated/graphql"
+import { GetPlantsQuery, UserRole } from "@/graphql/generated/graphql"
 import { toast } from "sonner"
-import { ErrorLike } from "@apollo/client"
-import { AssignUserToPlantInput } from "@/app/actions"
+import { assignUserToPlant } from "@/app/actions"
 
-type AssignUserToPlant = {
-    error: ErrorLike | undefined;
-    data: AssignUserToPlantMutation | undefined;
-}
-export function AssignPlantToUserCommand({ userPlants, userId, plants, assignUserToPlant }: {
+
+export function AssignPlantToUserCommand({ userPlants, userId, plants }: {
     userPlants: string[],
     userId: string,
-    plants: {
-        __typename?: "Plant",
-        id: string,
-        code: string,
-        name: string,
-        address: string,
-        phone: string,
-        email: string,
-        isActive: boolean,
-        updatedAt: any,
-        createdAt: any,
-        company: {
-            id: string,
-            name: string
-        }
-    }[],
-    assignUserToPlant: (input: AssignUserToPlantInput) => Promise<AssignUserToPlant>
+    plants: GetPlantsQuery['plants']
 }) {
     const [values, setValues] = useState<string[]>(userPlants)
 

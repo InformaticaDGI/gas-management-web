@@ -1,7 +1,6 @@
-import createApolloClient from "@/graphql-client";
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { LoginDocument } from "@/graphql/generated/graphql";
+import { login } from "@/app/actions";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -15,16 +14,9 @@ export const authOptions: AuthOptions = {
 
                 if (!credentials) throw new Error('Credentials are required');
 
-                const client = await createApolloClient();
-
-                const { data, error } = await client.mutate({
-                    mutation: LoginDocument,
-                    variables: {
-                        input: {
-                            email: credentials.email,
-                            password: credentials.password
-                        }
-                    }
+                const { data, error } = await login({
+                    email: credentials.email,
+                    password: credentials.password
                 })
 
                 if (error || !data) throw new Error('Invalid credentials');
@@ -55,14 +47,12 @@ export const authOptions: AuthOptions = {
                 token.accessToken = user.accessToken;
                 token.expiresIn = user.expiresIn;
             }
-            console.log({ type: 'jwt', token, user })
             return token;
         },
         async session({ session, token }) {
             session.user.id = token.sub as string;
             session.accessToken = token.accessToken;
             session.expiresIn = token.expiresIn;
-            console.log({ type: 'session', session, token })
             return session;
         }
     },

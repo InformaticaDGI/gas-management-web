@@ -7,12 +7,11 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CreateUserDocument } from "@/graphql/generated/graphql";
 import { userFormSchema, UserFormSchema } from "@/schemas/user.schema";
-import createApolloClient from "@/graphql-client";
+import { createUser } from "@/app/actions";
 
 
-export default function UserForm({ accessToken }: { accessToken: string }) {
+export default function UserForm() {
 
     const router = useRouter();
     const form = useForm<UserFormSchema>({
@@ -29,15 +28,11 @@ export default function UserForm({ accessToken }: { accessToken: string }) {
 
     const onSubmit = async (values: UserFormSchema) => {
         const { email, name, password } = values;
-        const client = await createApolloClient({ accessToken });
 
-        const { error } = await client.mutate({
-            mutation: CreateUserDocument,
-            variables: {
-                email,
-                name,
-                password
-            }
+        const { error } = await createUser({
+            email,
+            name,
+            password
         });
 
         if (error) {

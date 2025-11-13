@@ -1,11 +1,14 @@
-import { assignUserToPlant, getPlants, getUsers } from "@/app/actions";
-import { UserDataTable } from "@/components/Users/user-datatable";
-import { UserHeader } from "@/components/Users/user-header";
+import { getPlants, getUsers } from "@/app/actions";
+import { SiteHeader } from "@/components/site-header";
+import { Button } from "@/components/ui/button";
+import { UserDataTable } from "@/components/users/user-datatable";
+import { IconCirclePlusFilled } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default async function UsersPage() {
-    const [users, plants] = await Promise.all([getUsers(), getPlants()]);
+    const [usersData, plantsData] = await Promise.all([getUsers(), getPlants()]);
 
-    if (!users || !plants) {
+    if (usersData.error || plantsData.error) {
         return <div>
             <div className="w-full max-w-full py-4">
                 <div className="flex flex-col gap-4">
@@ -15,19 +18,25 @@ export default async function UsersPage() {
         </div>
     }
 
+    const { users } = usersData;
+    const { plants } = plantsData;
+
     return <>
-        <UserHeader />
+        <SiteHeader title="Usuarios">
+            <div className="ml-auto flex items-center gap-2">
+                <Button size="sm" className="hidden h-7 sm:flex" asChild>
+                    <Link href="/users/create">
+                        <IconCirclePlusFilled />
+                        <span>Crear usuario</span>
+                    </Link>
+                </Button>
+            </div>
+        </SiteHeader>
         <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
                 <div>
                     <div className="w-full max-w-full py-4">
-                        <UserDataTable data={users.users.map(user => ({
-                            ...user,
-                            userPlants: user.userPlants.map(up => ({
-                                ...up,
-                                plant: up.plant as any
-                            }))
-                        }))} plants={plants.plants} assignUserToPlant={assignUserToPlant}/>
+                        <UserDataTable data={users} plants={plants} />
                     </div>
                 </div>
             </div>

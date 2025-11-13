@@ -1,5 +1,5 @@
-mutation CreateContainer($plantId: ID!, $name: String!, $maxCapacityL: Float!, $currentInventoryL: Float!) {
-  createContainer(plantId: $plantId, name: $name, maxCapacityL: $maxCapacityL, currentInventoryL: $currentInventoryL) {
+mutation CreateContainer($input: CreateContainerInput!) {
+  createContainer(input: $input) {
     id
   }
 }

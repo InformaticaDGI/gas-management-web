@@ -28,10 +28,6 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
-  const response = await getMyData(session.accessToken);
-
-  console.log({ session: session.accessToken });
-
   return <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <SectionCards />
     <div className="px-4 lg:px-6">

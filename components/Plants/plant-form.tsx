@@ -6,21 +6,14 @@ import { Controller, useForm } from "react-hook-form"
 import { Select } from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import createApolloClient from "@/graphql-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CreatePlantDocument, CreatePlantMutation } from "@/graphql/generated/graphql";
 import { plantFormSchema, PlantFormSchema } from "@/schemas/plant.schema";
-import { CreatePlantInput } from "@/app/actions";
-import { ErrorLike } from "@apollo/client";
+import { createPlant } from "@/app/actions";
+import { CompaniesQuery } from "@/graphql/generated/graphql";
 
-type CreatePlant = {
-    error: ErrorLike | undefined;
-    data: CreatePlantMutation | undefined;
-}
-
-export default function PlantForm({ companies, createPlant }: { companies: { address: string, name: string, id: string, rif: string }[], createPlant: (plant: CreatePlantInput) => Promise<CreatePlant> }) {
+export default function PlantForm({ companies }: { companies: CompaniesQuery['companies'] }) {
 
     const router = useRouter();
     const form = useForm<PlantFormSchema>({

@@ -74,8 +74,8 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { PlantSchema } from "@/schemas/plant.schema"
 import { plantDictionaryNames } from "@/lib/dictionaries"
+import { GetPlantsQuery } from "@/graphql/generated/graphql"
 
 
 // Create a separate component for the drag handle
@@ -98,7 +98,7 @@ function DragHandle({ id }: { id: string }) {
   )
 }
 
-const columns: ColumnDef<PlantSchema>[] = [
+const columns: ColumnDef<GetPlantsQuery['plants'][number]>[] = [
   {
     id: "drag",
     header: () => null,
@@ -180,7 +180,7 @@ const columns: ColumnDef<PlantSchema>[] = [
 
 ]
 
-function DraggableRow({ row }: { row: Row<PlantSchema> }) {
+function DraggableRow({ row }: { row: Row<GetPlantsQuery['plants'][number]> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -208,7 +208,7 @@ function DraggableRow({ row }: { row: Row<PlantSchema> }) {
 export function PlantDataTable({
   data: initialData,
 }: {
-  data: PlantSchema[]
+  data: GetPlantsQuery['plants']
 }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
