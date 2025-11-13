@@ -74,8 +74,8 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { dailyClosingDictionaryNames, dailyClosingStatusDictionaryNames, plantDictionaryNames } from "@/lib/dictionaries"
-import { GetDailyClosingsQuery, GetPlantsQuery } from "@/graphql/generated/graphql"
+import { customerTypeDictionaryNames, plantDictionaryNames } from "@/lib/dictionaries"
+import { GetCustomersQuery } from "@/graphql/generated/graphql"
 
 
 // Create a separate component for the drag handle
@@ -98,7 +98,7 @@ function DragHandle({ id }: { id: string }) {
   )
 }
 
-const columns: ColumnDef<GetDailyClosingsQuery['dailyClosings'][number]>[] = [
+const columns: ColumnDef<GetCustomersQuery['customers'][number]>[] = [
   {
     id: "drag",
     header: () => null,
@@ -130,79 +130,93 @@ const columns: ColumnDef<GetDailyClosingsQuery['dailyClosings'][number]>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  
   {
-    accessorKey: "closingDate",
-    header: "Fecha de cierre",
-    cell: ({ row }) => {
-      const date = new Date(row.original.closingDate);
-      date.setUTCHours(date.getUTCHours() + 4);
-        return <div className="w-32">
-            <Badge variant="outline" className="text-muted-foreground px-1.5">
-              {date.toLocaleDateString("es-VE")}
-            </Badge>
-          </div>
-    },
+    accessorKey: "cedulaRif",
+    header: "Cédula / RIF",
+    cell: ({ row }) => (<div className="w-32">
+      <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {row.original.cedulaRif}
+      </Badge>
+    </div>),
   },
   {
-    accessorKey: "totalSales",
-    header: "Total de ventas",
+    accessorKey: "name",
+    header: "Nombre / Empresa",
+    cell: ({ row }) => (
+      <div className="w-32">
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.firstName} {row.original.lastName}
+        </Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "phone",
+    header: "Teléfono",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.totalSales}
+        {row.original.phone}
       </Badge>
     ),
   },
   {
-    accessorKey: "totalVolumeL",
-    header: "Total de volumen",
+    accessorKey: "address",
+    header: "Dirección",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.totalVolumeL}
+        {row.original.address}
       </Badge>
     ),
   },
   {
-    accessorKey: "createdBy",
-    header: "Cerrado por",
+    accessorKey: "state",
+    header: "Estado",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.createdBy.name}
+        {row.original.state}
       </Badge>
     ),
   },
   {
-    accessorKey: "plant",
-    header: "Planta",
+    accessorKey: "parish",
+    header: "Parroquia",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.plant.name}
+        {row.original.parish}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: "community",
+    header: "Comunidad",
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {row.original.community}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: "customerType",
+    header: "Tipo de Cliente",
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {customerTypeDictionaryNames[row.original.customerType]}
       </Badge>
     ),
   },
   {
     accessorKey: "status",
-    header: "Estado",
+    header: "Status",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {dailyClosingStatusDictionaryNames[row.original.status]}
+        {row.original.isActive ? "Activo" : "Inactivo"}
       </Badge>
     ),
   },
-  {
-    accessorKey: "notes",
-    header: "Notas",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.notes ? row.original.notes : "-"}
-      </Badge>
-    ),
-  },
-  
 
 ]
 
-function DraggableRow({ row }: { row: Row<GetDailyClosingsQuery['dailyClosings'][number]> }) {
+function DraggableRow({ row }: { row: Row<GetCustomersQuery['customers'][number]> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -227,10 +241,10 @@ function DraggableRow({ row }: { row: Row<GetDailyClosingsQuery['dailyClosings']
   )
 }
 
-export function DailyClosingDataTable({
+export function CustomerDataTable({
   data: initialData,
 }: {
-  data: GetDailyClosingsQuery['dailyClosings']
+  data: GetCustomersQuery['customers']
 }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
@@ -331,7 +345,7 @@ export function DailyClosingDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {dailyClosingDictionaryNames[column.id] || column.id}
+                      {plantDictionaryNames[column.id] || column.id}
                     </DropdownMenuCheckboxItem>
                   )
                 })}

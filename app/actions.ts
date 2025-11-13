@@ -4,7 +4,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, ExecuteDailyClosingDocument, GetDailyClosingsDocument, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
+import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreateCustomerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, GetCustomersDocument, CustomerType, ExecuteDailyClosingDocument, GetDailyClosingsDocument, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
 
 
 export async function createApolloClient({ accessToken }: CreateApolloClientProps = {}) {
@@ -103,6 +103,21 @@ export async function getDailyClosings() {
     };
 }
 
+export async function getCustomers() {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.query({
+        query: GetCustomersDocument,
+    });
+    return {
+        error: error ? error.message : null,
+        customers: data?.customers || [],
+    };
+}
+
 export async function getMe() {
     const session = await getServerSession(authOptions);
     if (!session || !session.accessToken) {
@@ -113,8 +128,8 @@ export async function getMe() {
         query: MeDocument,
     });
     return {
-        error,
-        data
+        error: error ? error.message : null,
+        me: data?.me || null,
     };
 }
 
@@ -248,9 +263,35 @@ export async function executeDailyClosing(input: ExecuteDailyClosingInput) {
     };
 }
 
-
+export async function createCustomer(input: CreateCustomerInput) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.mutate({
+        mutation: CreateCustomerDocument,
+        variables: { input }
+    });
+    return {
+        error,
+        data
+    };
+}
 
 /** Input Types */
+
+export type CreateCustomerInput = {
+    cedulaRif: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    address: string;
+    community: string;
+    customerType: CustomerType;
+    parish: string;
+    state: string;
+}
 
 export type ExecuteDailyClosingInput = {
     plantId: string;

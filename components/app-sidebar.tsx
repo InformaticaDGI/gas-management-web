@@ -18,8 +18,6 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
-  IconPackageExport,
-  IconPackageImport,
   IconPackages,
   IconReport,
   IconSearch,
@@ -40,17 +38,13 @@ import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { MeQuery } from "@/graphql/generated/graphql"
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  analytics: [
+  reports: [
     {
       title: "Cierres diarios",
-      url: "/analytics/daily-closings",
+      url: "/reports/daily-closings",
       icon: IconCalendar,
     },
   ],
@@ -70,6 +64,11 @@ const data = {
       url: "/inventory/products",
       icon: IconPackages,
     },
+    {
+      title: "Clientes",
+      url: "/inventory/customers",
+      icon: IconUsers,
+    }
   ],
   users: [
     {
@@ -88,17 +87,7 @@ const data = {
       title: "Plantas",
       url: "/plants",
       icon: IconListDetails,
-    },
-    {
-      title: "Clientes",
-      url: "/customers",
-      icon: IconUsers,
-    },
-    {
-      title: "Productos",
-      url: "/products",
-      icon: IconFolder,
-    },
+    }
   ],
   navClouds: [
     {
@@ -184,7 +173,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: MeQuery["me"] }) {
   return (
     <Sidebar collapsible="none" className="h-auto border-r" {...props}>
       <SidebarHeader className="border-b">
@@ -204,14 +193,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} label="Inicio" />
-        <NavMain items={data.analytics} label="Analítica" />
+        <NavMain items={data.reports} label="Reportes" />
         <NavMain items={data.inventory} label="Inventario" />
         <NavMain items={data.users} label="Usuarios" />
-        <NavDocuments items={data.documents} />
+        {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

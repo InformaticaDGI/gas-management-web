@@ -9,14 +9,14 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const { data, error } = await getMe();
+  const { me, error } = await getMe();
 
-  if (error || !data || !data.me) {
+  if (error || !me) {
     console.error("Error al obtener los datos del usuario:", error);
     redirect("/auth/login");
   }
 
-  if (!data.me.isActive) {
+  if (!me.isActive) {
     signOut({ redirect: true, callbackUrl: "/auth/login" });
   }
 
@@ -30,7 +30,7 @@ export default async function Layout({
       } as React.CSSProperties
     }
   >
-    <AppSidebar variant="sidebar" />
+    <AppSidebar variant="sidebar" user={me} />
     <SidebarInset>
       {children}
     </SidebarInset>

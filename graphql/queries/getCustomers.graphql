@@ -1,0 +1,17 @@
+query GetCustomers {
+  customers {
+    id
+    cedulaRif
+    firstName
+    lastName
+    phone
+    address
+    state
+    parish
+    community
+    customerType
+    isActive
+    createdAt
+    updatedAt
+  }
+}

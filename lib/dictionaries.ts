@@ -1,4 +1,4 @@
-import { CustomerType } from "@/graphql/generated/graphql"
+import { CustomerType, ClosingStatus } from "@/graphql/generated/graphql"
 
 export const plantDictionaryNames: Record<string, string> = {
     code: "Código",
@@ -41,4 +41,10 @@ export const plantDictionaryNames: Record<string, string> = {
     [CustomerType.ConsejosComunales]: "Consejos Comunales",
     [CustomerType.EmpresasPrivadas]: "Empresas Privadas",
     [CustomerType.PublicoGeneral]: "Público General",
+  }
+
+  export const dailyClosingStatusDictionaryNames: Record<string, string> = {
+    [ClosingStatus.Pending]: "Pendiente",
+    [ClosingStatus.Completed]: "Completado",
+    [ClosingStatus.Failed]: "Fallido",
   }
