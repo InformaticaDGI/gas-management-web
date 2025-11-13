@@ -1,0 +1,23 @@
+query getDailyClosings {
+  dailyClosings {
+    id
+    closingDate
+    createdAt
+    notes
+    status
+    totalSales
+    totalVolumeL
+    createdBy {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    plant {
+      code
+      name
+      createdAt
+      updatedAt
+    }
+  }
+}

@@ -26,6 +26,17 @@ export const plantDictionaryNames: Record<string, string> = {
     customerType: "Tipo de Cliente",
   }
 
+  export const dailyClosingDictionaryNames: Record<string, string> = {
+    id: "N°",
+    closingDate: "Fecha de cierre",
+    totalSales: "Total de ventas",
+    totalVolumeL: "Total de volumen",
+    createdBy: "Cerrado por",
+    plant: "Planta",
+    status: "Estado",
+    notes: "Notas",
+  }
+
   export const customerTypeDictionaryNames: Record<string, string> = {
     [CustomerType.ConsejosComunales]: "Consejos Comunales",
     [CustomerType.EmpresasPrivadas]: "Empresas Privadas",

@@ -4,7 +4,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
+import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, CustomerType, ExecuteDailyClosingDocument, GetDailyClosingsDocument, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
 
 
 export async function createApolloClient({ accessToken }: CreateApolloClientProps = {}) {
@@ -86,6 +86,37 @@ export async function getProducts() {
     };
 }
 
+export async function getDailyClosings() {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    console.log({ accessToken: session.accessToken })
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.query({
+        query: GetDailyClosingsDocument,
+    });
+
+    return {
+        error: error ? error.message : null,
+        dailyClosings: data?.dailyClosings || [],
+    };
+}
+
+export async function getMe() {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.query({
+        query: MeDocument,
+    });
+    return {
+        error,
+        data
+    };
+}
 
 /** Mutations */
 
@@ -201,14 +232,15 @@ export async function createProduct(input: CreateProductInput) {
     };
 }
 
-export async function getMe() {
+export async function executeDailyClosing(input: ExecuteDailyClosingInput) {
     const session = await getServerSession(authOptions);
     if (!session || !session.accessToken) {
         redirect("/auth/login");
     }
     const client = await createApolloClient({ accessToken: session.accessToken });
-    const { error, data } = await client.query({
-        query: MeDocument,
+    const { error, data } = await client.mutate({
+        mutation: ExecuteDailyClosingDocument,
+        variables: input
     });
     return {
         error,
@@ -219,6 +251,11 @@ export async function getMe() {
 
 
 /** Input Types */
+
+export type ExecuteDailyClosingInput = {
+    plantId: string;
+    notes?: string;
+}
 
 type CreateApolloClientProps = {
     accessToken?: string;

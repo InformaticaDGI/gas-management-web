@@ -1,0 +1,11 @@
+mutation ExecuteDailyClosing($plantId: ID!, $notes: String) {
+  executeDailyClosing(plantId: $plantId, notes: $notes) {
+    id
+    closingDate
+    totalSales
+    totalVolumeL
+    status
+    notes
+    createdAt
+  }
+}

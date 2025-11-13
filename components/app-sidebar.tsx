@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import {
+  IconCalendar,
   IconCamera,
   IconChartBar,
   IconCylinder,
@@ -46,6 +47,13 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
+  analytics: [
+    {
+      title: "Cierres diarios",
+      url: "/analytics/daily-closings",
+      icon: IconCalendar,
+    },
+  ],
   inventory: [
     {
       title: "Entradas",
@@ -196,6 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} label="Inicio" />
+        <NavMain items={data.analytics} label="Analítica" />
         <NavMain items={data.inventory} label="Inventario" />
         <NavMain items={data.users} label="Usuarios" />
         <NavDocuments items={data.documents} />
