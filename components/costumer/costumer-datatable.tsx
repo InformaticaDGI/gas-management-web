@@ -137,7 +137,7 @@ const createColumns = (onDelete: (customerId: string) => void): ColumnDef<GetCus
     header: "Cédula / RIF",
     cell: ({ row }) => (<div className="w-32">
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.cedulaRif}
+        {row.original.documentType}-{row.original.cedulaRif}
       </Badge>
     </div>),
   },
