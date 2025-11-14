@@ -48,3 +48,17 @@ export const plantDictionaryNames: Record<string, string> = {
     [ClosingStatus.Completed]: "Completado",
     [ClosingStatus.Failed]: "Fallido",
   }
+
+  export const customerDictionaryNames: Record<string, string> = {
+    documentType: "Tipo de documento",
+    cedulaRif: "Cédula/RIF",
+    name: "Nombre",
+    firstName: "Nombre",
+    lastName: "Apellido",
+    phone: "Teléfono",
+    address: "Dirección",
+    state: "Estado",
+    parish: "Parroquia",
+    community: "Comunidad",
+    customerType: "Tipo de cliente",
+  }

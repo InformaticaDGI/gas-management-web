@@ -1,0 +1,3 @@
+mutation DeleteCustomer($deleteCustomerId: ID!) {
+  deleteCustomer(id: $deleteCustomerId)
+}

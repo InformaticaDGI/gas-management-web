@@ -1,0 +1,20 @@
+
+mutation UpdateCustomer($updateCustomerId: ID!, $cedulaRif: String, $firstName: String, $phone: String, $address: String, $state: String, $parish: String, $community: String, $customerType: CustomerType, $isActive: Boolean, $lastName: String) {
+  updateCustomer(id: $updateCustomerId, cedulaRif: $cedulaRif, firstName: $firstName, phone: $phone, address: $address, state: $state, parish: $parish, community: $community, customerType: $customerType, isActive: $isActive, lastName: $lastName) {
+    id
+    cedulaRif
+    firstName
+    lastName
+    phone
+    address
+    state
+    parish
+    community
+    customerType
+    documentType
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+

@@ -1,0 +1,18 @@
+query GetCustomerByCedulaRif($cedulaRif: String!) {
+  customerByCedulaRif(cedulaRif: $cedulaRif) {
+    id
+    cedulaRif
+    firstName
+    lastName
+    phone
+    address
+    state
+    parish
+    community
+    customerType
+    documentType
+    isActive
+    createdAt
+    updatedAt
+  }
+}

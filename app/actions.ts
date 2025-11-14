@@ -4,7 +4,7 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./api/auth/[...nextauth]/route";
-import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreateCustomerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, GetCustomersDocument, CustomerType, ExecuteDailyClosingDocument, GetDailyClosingsDocument, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery } from "@/graphql/generated/graphql";
+import { AssignUserToPlantDocument, CompaniesDocument, CreateContainerDocument, CreateCustomerDocument, CreatePlantDocument, CreateProductDocument, CreateUserDocument, GetCustomersDocument, CustomerType, ExecuteDailyClosingDocument, GetDailyClosingsDocument, GetPlantsDocument, GetProductsDocument, LoginDocument, MeDocument, ProductType, UnitType, UserRole, UsersDocument, UsersQuery, DocumentType, DeleteCustomerDocument, GetCustomerByCedulaRifDocument, UpdateCustomerDocument } from "@/graphql/generated/graphql";
 
 
 export async function createApolloClient({ accessToken }: CreateApolloClientProps = {}) {
@@ -17,7 +17,7 @@ export async function createApolloClient({ accessToken }: CreateApolloClientProp
     }
 
     return new ApolloClient({
-        link: new HttpLink({ uri: API_BASE_URL, headers }),
+        link: new HttpLink({ uri: API_BASE_URL, headers, fetchOptions: { next: { tags: ['customers'] } } }),
         cache: new InMemoryCache(),
     });
 }
@@ -112,9 +112,27 @@ export async function getCustomers() {
     const { error, data } = await client.query({
         query: GetCustomersDocument,
     });
+
     return {
         error: error ? error.message : null,
         customers: data?.customers || [],
+    };
+}
+
+export async function getCustomerByCedulaRif(cedulaRif: string) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    console.log({ accessToken: session.accessToken })
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.query({
+        query: GetCustomerByCedulaRifDocument,
+        variables: { cedulaRif },
+    });
+    return {
+        error: error ? error.message : null,
+        customer: data?.customerByCedulaRif || null,
     };
 }
 
@@ -273,6 +291,44 @@ export async function createCustomer(input: CreateCustomerInput) {
         mutation: CreateCustomerDocument,
         variables: { input }
     });
+
+    return {
+        error,
+        data
+    };
+}
+
+export async function deleteCustomer(customerId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+    const { error, data } = await client.mutate({
+        mutation: DeleteCustomerDocument,
+        variables: { deleteCustomerId: customerId },
+    });
+
+    return {
+        error,
+        data
+    };
+}
+
+export async function updateCustomer(input: UpdateCustomerInput) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.accessToken) {
+        redirect("/auth/login");
+    }
+    const client = await createApolloClient({ accessToken: session.accessToken });
+
+    const { error, data } = await client.mutate({
+        mutation: UpdateCustomerDocument,
+        variables: {
+            updateCustomerId: input.updateCustomerId,
+            ...input.input
+        }
+    });
     return {
         error,
         data
@@ -281,10 +337,16 @@ export async function createCustomer(input: CreateCustomerInput) {
 
 /** Input Types */
 
+export type UpdateCustomerInput = {
+    updateCustomerId: string;
+    input: Partial<CreateCustomerInput>;
+}
+
 export type CreateCustomerInput = {
+    documentType: DocumentType;
     cedulaRif: string;
     firstName: string;
-    lastName: string;
+    lastName?: string;
     phone: string;
     address: string;
     community: string;

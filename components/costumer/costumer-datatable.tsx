@@ -74,8 +74,9 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { customerTypeDictionaryNames, plantDictionaryNames } from "@/lib/dictionaries"
+import { customerDictionaryNames, customerTypeDictionaryNames, plantDictionaryNames } from "@/lib/dictionaries"
 import { GetCustomersQuery } from "@/graphql/generated/graphql"
+import { CustomerActions } from "./costumer-actions"
 
 
 // Create a separate component for the drag handle
@@ -98,7 +99,8 @@ function DragHandle({ id }: { id: string }) {
   )
 }
 
-const columns: ColumnDef<GetCustomersQuery['customers'][number]>[] = [
+// Las columnas se definirán dentro del componente para tener acceso a setData
+const createColumns = (onDelete: (customerId: string) => void): ColumnDef<GetCustomersQuery['customers'][number]>[] => [
   {
     id: "drag",
     header: () => null,
@@ -213,6 +215,12 @@ const columns: ColumnDef<GetCustomersQuery['customers'][number]>[] = [
       </Badge>
     ),
   },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return <CustomerActions customer={row.original} onDelete={onDelete} />
+      }
+    },
 
 ]
 
@@ -246,6 +254,7 @@ export function CustomerDataTable({
 }: {
   data: GetCustomersQuery['customers']
 }) {
+
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -264,6 +273,12 @@ export function CustomerDataTable({
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
   )
+
+  const handleDeleteCustomer = React.useCallback((customerId: string) => {
+    setData((prevData) => prevData.filter((customer) => customer.id !== customerId));
+  }, []);
+
+  const columns = React.useMemo(() => createColumns(handleDeleteCustomer), [handleDeleteCustomer]);
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
@@ -293,6 +308,11 @@ export function CustomerDataTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    meta: {
+      updateData: (newData: GetCustomersQuery['customers']) => {
+        setData(newData);
+      },
+    },
   })
 
   function handleDragEnd(event: DragEndEvent) {
@@ -345,7 +365,7 @@ export function CustomerDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {plantDictionaryNames[column.id] || column.id}
+                      {customerDictionaryNames[column.id] || column.id}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
@@ -397,7 +417,7 @@ export function CustomerDataTable({
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns.length}
+                      colSpan={table.getAllColumns().length}
                       className="h-24 text-center"
                     >
                       No hay resultados.

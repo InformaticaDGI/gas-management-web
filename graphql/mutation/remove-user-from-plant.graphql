@@ -1,0 +1,3 @@
+mutation RemoveUserFromPlant($userId: ID!, $plantId: ID!) {
+  removeUserFromPlant(userId: $userId, plantId: $plantId)
+}
